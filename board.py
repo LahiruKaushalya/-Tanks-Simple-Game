@@ -4,7 +4,7 @@ from brickcell import BrickCell
 from watercell import WaterCell
 from stonecell import StoneCell
 
-#these are the size of a cell in pixels
+
 CELL_WIDTH = 60
 CELL_HEIGHT = 60
 NUM_ROWS = 10
@@ -14,14 +14,16 @@ class Board():
     def __init__(self): 
         self.grid = [[0]*NUM_COLS for a in range(NUM_ROWS)]
         self.cells = pygame.sprite.Group()
-        
-    def set_terrain(self,coords,ttype):
-        for cord in coords:
-            self.grid[cord[0]][cord[1]] = ttype
+
+    def init_board(self,data):
+        for i in xrange(2,len(data)):
+            for c in data[i].split(";"):
+                tmp = c.split(",")
+                self.grid[int(tmp[1])][int(tmp[0])] = 1-i
     
     def draw_board(self):
-        for i in range(NUM_ROWS):
-            for j in range(NUM_COLS):
+        for i in xrange(NUM_ROWS):
+            for j in xrange(NUM_COLS):
                 if self.grid[i][j] == 0:
                     cell = GroundCell()
                 elif self.grid[i][j] == -1:
