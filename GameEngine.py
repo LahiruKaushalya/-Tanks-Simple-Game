@@ -12,12 +12,59 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
 FPS = 24
 
+
+hasUpdate = False
+updateData = None
+
+class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+    def handle(self):
+        global hasUpdate
+        global updateData
+        try:
+            data = self.request.recv(1024)
+            updateData = data
+            hasUpdate = True
+            print data
+        except:
+            print "Exception at server"
+            
+
+hasUpdate = False
+updateData = None
+
+     	
+sc = ServerClient(ThreadedTCPRequestHandler)
+
+sc.start_server()
+sc.connect_client("127.0.0.1", 6000)
+sc.send_message("JOIN#")
+
+while not hasUpdate:
+    pass
+
+hasUpdate = False
+
+comps = updateData[:-1].split(":")
+print comps
+playerNum = int(comps[1][1])
+
+
+brickList = list()
+for c in comps[2].split(";"):
+    tmp = c.split(",")
+    brickList.append((int(tmp[1]), int(tmp[0])))
+    
+stoneList=list()
+for stone in comps[3].split(";"):
+    tempo = stone.split(",")
+    stoneList.append((int(tempo[1]),int(tempo[0])))
+    
+waterList=list()
+for w in comps[4].split(";"):
+    tempo = w.split(",")
+    waterList.append((int(tempo[1]),int(tempo[0])))
+
 board = Board()
-
-brickList = [(0,0),(5,6),(7,8)]
-stoneList = [(9,0),(2,6),(1,7)]
-waterList = [(0,8),(9,6),(6,8)]
-
 
 board.set_terrain(brickList,-1)
 board.set_terrain(stoneList,-2)
